@@ -5,7 +5,7 @@ from PyQt5 import QtWidgets
 import sys
 
 # Main window ui import
-from src.mainwindow import MainWindow
+from src.MyWindow import MainWindow
 
 
 def main():
