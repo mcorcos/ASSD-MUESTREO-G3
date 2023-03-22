@@ -68,7 +68,7 @@ class Ui_MainWindow(object):
         self.label.setText(_translate("MainWindow", "<html><head/><body><p><img src=\":/newPrefix/chain.png\"/></p></body></html>"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab), _translate("MainWindow", "Scope"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_2), _translate("MainWindow", "Multiple Views"))
-import resource pic_rc
+import src.pics.resource_pic
 
 
 if __name__ == "__main__":
