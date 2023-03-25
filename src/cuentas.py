@@ -4,16 +4,13 @@ import scipy.signal as ss
 import matplotlib.pyplot as plt
 
 
-class AntiAliasFilter:
+class Filter:
     """
     AntiAliasFilter:
 
     
     """
     def __init__(self):
-        """
-
-        """
 
         self.transferFunc = ss.ZerosPolesGain([], [1], 1)
 
@@ -51,6 +48,10 @@ class AntiAliasFilter:
         """
         w, mag, phase = ss.bode(self.transferFunc, w = w, n = n)
         return w, mag, phase
+    
+    def getTempResponse(self, t, y):
+        t_out, y_out, x_out = ss.lsim(self.transferFunc, y, t)
+        return t_out, y_out
 
 
 ######################################################
@@ -91,15 +92,28 @@ class AntiAliasFilter:
 
         return ss.ZerosPolesGain(z,p,k)
 
-"""
-filtro = AntiAliasFilter()
+
+filtro = Filter()
 
 filtro.updateFilter(fp=1e3, ap=3, fa=2e3, aa=40, approx="cheby2")
-
+'''
 w, mag, phase = filtro.getBode()
 plt.figure()
 plt.semilogx(w/(2*pi), mag)    # Bode magnitude plot
 plt.figure()
 plt.semilogx(w/(2*pi), phase)  # Bode phase plot
 plt.show()
-"""
+'''
+t = np.linspace(0, 0.01, 1000)
+y = np.append(np.zeros(10), np.ones(990))
+y = np.cos(2*pi*1000*t) + np.cos(2*pi*1300*t + 1) 
+
+t_out, y_out = filtro.getTempResponse(t, y)
+
+fig, ax = plt.subplots()
+
+ax.plot(t_out, y_out)
+ax.plot(t, y)
+plt.show()
+
+
