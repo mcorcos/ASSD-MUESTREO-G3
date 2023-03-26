@@ -4,6 +4,14 @@ import scipy.signal as ss
 import matplotlib.pyplot as plt
 
 
+
+
+
+
+
+
+
+
 class Filter:
     """
     AntiAliasFilter:
@@ -51,7 +59,7 @@ class Filter:
     
     def getTempResponse(self, t, y):
         t_out, y_out, x_out = ss.lsim(self.transferFunc, y, t)
-        return t_out, y_out
+        return [t_out, y_out]
 
 
 ######################################################
@@ -93,49 +101,26 @@ class Filter:
         return ss.ZerosPolesGain(z,p,k)
 
 
-filtro = Filter()
 
-filtro.updateFilter(fp=1e3, ap=3, fa=2e3, aa=40, approx="cheby2")
-'''
-w, mag, phase = filtro.getBode()
-plt.figure()
-plt.semilogx(w/(2*pi), mag)    # Bode magnitude plot
-plt.figure()
-plt.semilogx(w/(2*pi), phase)  # Bode phase plot
-plt.show()
-
-t = np.linspace(0, 0.01, 1000)
-y = np.append(np.zeros(10), np.ones(990))
-y = np.cos(2*pi*1000*t) + np.cos(2*pi*1300*t + 1) 
-
-t_out, y_out = filtro.getTempResponse(t, y)
-
-fig, ax = plt.subplots()
-
-ax.plot(t_out, y_out)
-ax.plot(t, y)
-plt.show()
-'''
 
 class sampleAndHold:
     def __init__(self):
         self.fs=1e3
-        self.sampledSignal=0
 
     def updateSH(self, fs):
         self.fs = fs
 
-    def signalSample(self,y_in,t_in):
-        self.sampledSignal=np.zeros(len(t_in))
+    def getSampledSignal(self,y_in,t_in):
+        sampledSignal=np.zeros(len(t_in))
         sampleT=1/self.fs
         timeInterval=t_in[1]-t_in[0]
         index=np.rint(sampleT/timeInterval)
         for i in range(len(t_in)):
             if i%(index)==0:
-                self.sampledSignal[i]=y_in[i]
+                sampledSignal[i]=y_in[i]
             else:
-                self.sampledSignal[i]=self.sampledSignal[i-1]
-                 
+                sampledSignal[i]=self.sampledSignal[i-1]
+        return [sampledSignal,t_in]
 
 class analogSwitch:
     def __init__(self):
@@ -143,35 +128,90 @@ class analogSwitch:
         self.DC=0.5
         self.tau=self.DC*1/self.fs
         self.state=True
-        self.resampledSignal=0
+
 
     def updateSwitch(self,DC,fs):
         self.fs=fs
         self.DC=DC
 
-    def resampleSignal(self,y_in,t_in):
-        self.resampledSignal=np.zeros(len(t_in))
+    def getResampleSignal(self,y_in,t_in):
+        resampledSignal=np.zeros(len(t_in))
         turnOffT=1/self.fs
         timeInterval=t_in[1]-t_in[0]
         T_index=np.rint(turnOffT/timeInterval)
         DC_index=np.rint(turnOffT/timeInterval*self.DC)
-        if self.state:
-            for i in range(len(t_in)):
-                if (i%T_index)<DC_index:
-                    self.resampledSignal[i]=y_in[i]
-                else:
-                    self.resampledSignal[i]=0
+        for i in range(len(t_in)):
+            if (i%T_index)<DC_index:
+                self.resampledSignal[i]=y_in[i]
+            else:
+                self.resampledSignal[i]=0
+        return [resampledSignal,t_in]
         
 
 
-sandH=sampleAndHold()
-t = np.linspace(0, 0.01, 1000000)
-y = np.cos(2*pi*100*t)
-sandH.signalSample(y,t)
-switch=analogSwitch()
-switch.resampleSignal(sandH.sampledSignal,t)
-fig, ax= plt.subplots()
-ax.plot(t,y)
-ax.plot(t,sandH.sampledSignal)
-ax.plot(t,switch.resampledSignal)
-plt.show()   
+
+class System:
+    def __init__(self):
+        
+        self.FAA = Filter()
+        self.SH = sampleAndHold()
+        self.AnalogSwitch = analogSwitch()
+        self.FR = Filter()
+
+
+        self.Xin = [0,0]
+        self.Node_1 = [0,0]
+        self.Node_2 = [0,0]
+        self.Node_3 = [0,0]
+        self.Node_4 = [0,0]
+
+
+
+
+
+    def updateStages(self):
+        self.FAA.updateFilter()
+        self.SH.updateSH()
+        self.AnalogSwitch.updateSwitch()
+        self.FR.updateFilter()
+
+
+    def updateSignals(self,y_in,t_in ,checkList):
+        self.Xin = [y_in,t_in]
+
+
+        if checkList["Filtro AA"]:
+            self.Node_1= self.FAA.getTempResponse( self.Xin[0],self.Xin[1])
+        else:
+            self.Node_1 = self.Xin
+
+
+        if checkList["Sample and Hold"]:
+            self.Node_2= self.SH.getSampledSignal( self.Node_1[0],self.Node_1[1])
+        else:
+            self.Node_2 = self.Node_1
+
+
+        if checkList["Analog Switch"]:
+            self.Node_3= self.AnalogSwitch.getResampleSignal( self.Node_2[0],self.Node_2[1])
+        else:
+            self.Node_3 = self.Node_2
+
+
+
+        if checkList["Filter"]:
+            self.Node_4= self.FR.getTempResponse( self.Node_3[0],self.Node_3[1])
+        else:
+            self.Node_4 = self.Node_3
+
+
+def getXin(self):
+    return self.Xin
+def getNode_1(self):
+    return self.Node_1
+def getNode_2(self):
+    return self.Node_2
+def getNode_3(self):
+    return self.Node_3
+def getNode_4(self):
+    return self.Node_4

@@ -5,13 +5,24 @@ from PyQt5.QtWidgets import QCheckBox
 
 # Project modules
 from src.ui.mainwindow import Ui_MainWindow
-
+from src.MPLClases import ScopePlot
+from src.cuentas import System
 
 class MainWindow(QMainWindow, Ui_MainWindow):
 
     def __init__(self):
         super(MainWindow, self).__init__()
         self.setupUi(self)
+
+        ##asigno una clase para los layouts
+
+        self.Scope  = ScopePlot(self.layout_scopeTemp)
+        self.system = System()
+
+
+
+
+
 
         self.text_fs.textChanged.connect(self.changeSamplingDial)
         self.dial_fs.valueChanged.connect(self.changeSamplingText)
@@ -27,6 +38,31 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.check_fr.stateChanged.connect(self.changeCheckBoxColor3)
         self.check_sh.stateChanged.connect(self.changeCheckBoxColor4)
  
+
+
+
+
+
+## defino la funcion que me plotea en el scope 
+
+    def plotScope(self):
+        node = self.getNode()
+        if node == 0:
+            value = self.system.getXin()
+        if node == 1:
+            value =self.system.getNode_1()
+        if node == 2:
+            value =self.system.getNode_2()
+        if node == 3:
+            value =self.system.getNode_3()
+        if node == 4:
+            value =self.system.getNode_4()
+
+        self.Scope.plot(value[0],value[1])
+        return
+
+
+
 
     def changeSamplingDial(self,freqValueText):
        freqT = self.strToInt(freqValueText) 
@@ -120,4 +156,37 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         return
     
 
+##    lo que pasa uando apretas el boton de graficar
     
+
+
+    def plotButton(self):
+        y,t = self.getUserFunction()
+        self.system.updateSignals(y,t,self.getCheckList())
+        return
+
+
+    def getCheckList(self):
+        checklist = {"Filtro AA": self.check_FAA.isChecked() ,
+                     "Sample and Hold": self.check_sh.isChecked(),
+                     "Analog Switch":self.check_analogswitch.isChecked(),
+                     "Filter":self.check_fr.isChecked()}
+        return checklist
+    
+
+
+
+    def getNode(self):
+                
+        ##son los nodos , no checkbox
+        NodeList = {} 
+        
+
+        for index in NodeList:
+            if(NodeList[index]):
+                return index
+            
+def getUserFunction(self):
+
+
+    return y,t

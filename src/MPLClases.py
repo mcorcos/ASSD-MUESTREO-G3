@@ -1,0 +1,37 @@
+from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
+# NavigationToolbar2QT as NavigationToolbar
+from matplotlib.figure import Figure
+import numpy as np
+
+import matplotlib.patches as mpatches
+
+
+class MplCanvas(FigureCanvas):
+    """
+        MplCanvas
+    """
+    def __init__(self, parent=None):
+        self.fig = Figure()
+        super().__init__(self.fig)
+
+        self.axes = self.fig.add_subplot()
+        self.fig.set_tight_layout(True)
+
+        parent.layout().addWidget(self)
+
+class ScopePlot(MplCanvas):
+    """
+        RulerPlot
+    """
+    def __init__(self, parent=None):
+        if parent is not None:
+            super().__init__(parent)
+
+    def plot(self, node):    ## nodo 0:   , nodo 1:  , nodo 2:    ,nodo 3 .
+
+        self.axes.clear()
+
+
+
+
+        self.fig.canvas.draw()
