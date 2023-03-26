@@ -25,6 +25,7 @@ class Filter:
     def updateFilter(self, fp, ap, fa, aa, approx):
         """
         Updates filter parameters
+            [butter, cheby1, cheby2, ellip]
 
         """
         self.fp = fp
