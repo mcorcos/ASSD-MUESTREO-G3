@@ -177,6 +177,7 @@ class System:
 
 
     def updateSignals(self,y_in,t_in ,checkList):
+        
         self.Xin = [y_in,t_in]
 
 
