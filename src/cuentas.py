@@ -57,9 +57,9 @@ class Filter:
         w, mag, phase = ss.bode(self.transferFunc, w = w, n = n)
         return w, mag, phase
     
-    def getTempResponse(self, t, y):
+    def getTempResponse(self, y,t):
         t_out, y_out, x_out = ss.lsim(self.transferFunc, y, t)
-        return [t_out, y_out]
+        return [ y_out , t_out]
 
 
 ######################################################
@@ -119,7 +119,7 @@ class sampleAndHold:
             if i%(index)==0:
                 sampledSignal[i]=y_in[i]
             else:
-                sampledSignal[i]=self.sampledSignal[i-1]
+                sampledSignal[i]=sampledSignal[i-1]
         return [sampledSignal,t_in]
 
 class analogSwitch:
@@ -142,9 +142,9 @@ class analogSwitch:
         DC_index=np.rint(turnOffT/timeInterval*self.DC)
         for i in range(len(t_in)):
             if (i%T_index)<DC_index:
-                self.resampledSignal[i]=y_in[i]
+                resampledSignal[i]=y_in[i]
             else:
-                self.resampledSignal[i]=0
+                resampledSignal[i]=0
         return [resampledSignal,t_in]
         
 
@@ -169,11 +169,11 @@ class System:
 
 
 
-    def updateStages(self):
-        self.FAA.updateFilter()
-        self.SH.updateSH()
-        self.AnalogSwitch.updateSwitch()
-        self.FR.updateFilter()
+    def updateStages(self,fp,ap,fa,aa,aprox,fs,DC):
+        self.FAA.updateFilter(fp,ap,fa,aa,aprox)
+        self.SH.updateSH(fs)
+        self.AnalogSwitch.updateSwitch(DC,fs)
+        self.FR.updateFilter(fp,ap,fa,aa,aprox)
 
 
     def updateSignals(self,y_in,t_in ,checkList):
@@ -206,13 +206,17 @@ class System:
             self.Node_4 = self.Node_3
 
 
-def getXin(self):
-    return self.Xin
-def getNode_1(self):
-    return self.Node_1
-def getNode_2(self):
-    return self.Node_2
-def getNode_3(self):
-    return self.Node_3
-def getNode_4(self):
-    return self.Node_4
+    def getXin(self):
+        return self.Xin
+    
+    def getNode_1(self):
+        return self.Node_1
+    
+    def getNode_2(self):
+        return self.Node_2
+    
+    def getNode_3(self):
+        return self.Node_3
+    
+    def getNode_4(self):
+        return self.Node_4

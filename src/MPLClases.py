@@ -30,5 +30,5 @@ class ScopePlot(MplCanvas):
     def plot(self, y_in , t_in):    
 
         self.axes.clear()
-        self.axes.plot(y_in,t_in,color='r')
+        self.axes.plot(t_in,y_in,color='r')
         self.fig.canvas.draw()

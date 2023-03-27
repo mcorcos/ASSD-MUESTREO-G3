@@ -595,7 +595,7 @@
        </attribute>
        <layout class="QHBoxLayout" name="horizontalLayout_7">
         <item>
-         <widget class="QPushButton" name="pushButton">
+         <widget class="QPushButton" name="button_plot">
           <property name="minimumSize">
            <size>
             <width>80</width>
