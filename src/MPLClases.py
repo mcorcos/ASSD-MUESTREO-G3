@@ -27,11 +27,8 @@ class ScopePlot(MplCanvas):
         if parent is not None:
             super().__init__(parent)
 
-    def plot(self, node):    ## nodo 0:   , nodo 1:  , nodo 2:    ,nodo 3 .
+    def plot(self, y_in , t_in):    
 
         self.axes.clear()
-
-
-
-
+        self.axes.plot(y_in,t_in,color='r')
         self.fig.canvas.draw()

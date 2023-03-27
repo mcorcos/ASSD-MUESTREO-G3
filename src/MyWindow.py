@@ -1,3 +1,8 @@
+#devolver seniales 
+import numpy as np
+from numpy import pi
+import scipy as signal
+
 # PyQt5 modules
 from PyQt5.QtWidgets import QMainWindow
 from PyQt5.QtWidgets import QMessageBox
@@ -18,7 +23,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         self.Scope  = ScopePlot(self.layout_scopeTemp)
         self.system = System()
-
+        
 
 
 
@@ -37,6 +42,11 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.check_analogswitch.stateChanged.connect(self.changeCheckBoxColor2)
         self.check_fr.stateChanged.connect(self.changeCheckBoxColor3)
         self.check_sh.stateChanged.connect(self.changeCheckBoxColor4)
+
+
+        #boton de graficar 
+
+        self.button_plot.clicked.connect(self.plotGraphs)
  
 
 
@@ -160,8 +170,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     
 
 
-    def plotButton(self):
-        y,t = self.getUserFunction()
+    def plotGraphs(self):
+        y , t = self.getUserFunction()
         self.system.updateSignals(y,t,self.getCheckList())
         return
 
@@ -179,14 +189,43 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def getNode(self):
                 
         ##son los nodos , no checkbox
-        NodeList = {} 
+        NodeList = {
+
+            "Xin": self.radio_Xin.clicked()   ,
+            "Node1": self.radio_node1.clicked() , 
+            "Node2": self.radio_node2.clicked()   ,
+            "Node3": self.radio_node3.clicked() , 
+            "Node4": self.radio_node4.clicked() , 
+
+
+        } 
         
 
         for index in NodeList:
             if(NodeList[index]):
                 return index
             
+
+
 def getUserFunction(self):
 
+    t = np.linspace(0,1000,50)
+    fb = self.freq_xinSlider.Value()
 
+    SignalList = {
+
+        "Sin": np.sin(2*pi*fb*t) ,
+
+        "Square":  np.square(2*pi*fb*t)   ,
+
+        "Triangle": signal.sawtooth(2 * np.pi * 5 * t, 0.5) ,
+
+        "Saw Tooth":   signal.sawtooth(2 * np.pi * 5 * t, 0.2)
+
+
+    }
+
+
+
+    y = SignalList[self.XinSelect.currentData()] 
     return y,t
