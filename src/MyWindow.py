@@ -1,7 +1,7 @@
 #devolver seniales 
 import numpy as np
 from numpy import pi
-import scipy as signal
+import scipy.signal as signal
 
 # PyQt5 modules
 from PyQt5.QtWidgets import QMainWindow
@@ -54,24 +54,24 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
 
 ## defino la funcion que me plotea en el scope 
+# """ 
+#     def plotScope(self):
+#         node = self.getNode()
+#         if node == 0:
+#             value = self.system.getXin()
+#         if node == 1:
+#             value =self.system.getNode_1()
+#         if node == 2:
+#             value =self.system.getNode_2()
+#         if node == 3:
+#             value =self.system.getNode_3()
+#         if node == 4:
+#             value =self.system.getNode_4()
 
-    def plotScope(self):
-        node = self.getNode()
-        if node == 0:
-            value = self.system.getXin()
-        if node == 1:
-            value =self.system.getNode_1()
-        if node == 2:
-            value =self.system.getNode_2()
-        if node == 3:
-            value =self.system.getNode_3()
-        if node == 4:
-            value =self.system.getNode_4()
+#         self.Scope.plot(value[0],value[1])
+#         return
 
-        self.Scope.plot(value[0],value[1])
-        return
-
-
+#  """
 
 
     def changeSamplingDial(self,freqValueText):
@@ -173,6 +173,23 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def plotGraphs(self):
         y , t = self.getUserFunction()
         self.system.updateSignals(y,t,self.getCheckList())
+        self.system.updateStages(1e3,3,2e3,40,"cheby2",self.dial_fs.value(),(self.dial_duty.value())/100)
+
+        node = self.getNode()
+        value = [0,0]
+        if node == "Xin":
+            value = self.system.getXin()
+        if node == "Node1":
+            value =self.system.getNode_1()
+        if node == "Node2":
+            value =self.system.getNode_2()
+        if node == "Node3":
+            value =self.system.getNode_3()
+        if node == "Node4":
+            value =self.system.getNode_4()
+
+        self.Scope.plot(value[0],value[1])
+        return
         return
 
 
@@ -191,11 +208,11 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         ##son los nodos , no checkbox
         NodeList = {
 
-            "Xin": self.radio_Xin.clicked()   ,
-            "Node1": self.radio_node1.clicked() , 
-            "Node2": self.radio_node2.clicked()   ,
-            "Node3": self.radio_node3.clicked() , 
-            "Node4": self.radio_node4.clicked() , 
+            "Xin": self.radio_Xin.isChecked()   ,
+            "Node1": self.radio_node1.isChecked()  , 
+            "Node2": self.radio_node2.isChecked()    ,
+            "Node3": self.radio_node3.isChecked()  , 
+            "Node4": self.radio_node4.isChecked()  , 
 
 
         } 
@@ -207,25 +224,25 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             
 
 
-def getUserFunction(self):
+    def getUserFunction(self):
 
-    t = np.linspace(0,1000,50)
-    fb = self.freq_xinSlider.Value()
+        t = np.linspace(0,1,1000)
+        fb = self.freq_xinSlider.value()
 
-    SignalList = {
+        SignalList = {
 
-        "Sin": np.sin(2*pi*fb*t) ,
+            "Sin": np.sin(2*pi*fb*t) ,
 
-        "Square":  np.square(2*pi*fb*t)   ,
+            "Square":  np.square(2*pi*fb*t)   ,
 
-        "Triangle": signal.sawtooth(2 * np.pi * 5 * t, 0.5) ,
+            "Triangle": signal.sawtooth(2 * np.pi * 5 * t, 0.5) ,
 
-        "Saw Tooth":   signal.sawtooth(2 * np.pi * 5 * t, 0.2)
-
-
-    }
+            "Saw Tooth":   signal.sawtooth(2 * np.pi * 5 * t, 0.2)
 
 
+        }
 
-    y = SignalList[self.XinSelect.currentData()] 
-    return y,t
+
+
+        y = SignalList[self.XinSelect.currentText()] 
+        return y,t
