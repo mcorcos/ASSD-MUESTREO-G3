@@ -3,6 +3,7 @@ import numpy as np
 from numpy import pi
 import scipy.signal as signal
 
+
 # PyQt5 modules
 from PyQt5.QtWidgets import QMainWindow
 from PyQt5.QtWidgets import QMessageBox
@@ -10,7 +11,7 @@ from PyQt5.QtWidgets import QCheckBox
 
 # Project modules
 from src.ui.mainwindow import Ui_MainWindow
-from src.MPLClases import ScopePlot
+from src.MPLClases import ScopePlot , TauPlot
 from src.cuentas import System
 
 class MainWindow(QMainWindow, Ui_MainWindow):
@@ -22,6 +23,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         ##asigno una clase para los layouts
 
         self.Scope  = ScopePlot(self.layout_scopeTemp)
+        self.Tau = TauPlot(self.layout_osc)
         self.system = System()
         
 
@@ -166,6 +168,16 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         return
     
 
+
+
+
+
+
+
+
+
+
+
 ##    lo que pasa uando apretas el boton de graficar
     
 
@@ -189,6 +201,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             value =self.system.getNode_4()
 
         self.Scope.plot(value[0],value[1])
+        self.Tau.plot((self.dial_duty.value())/100)
         return
         return
 
