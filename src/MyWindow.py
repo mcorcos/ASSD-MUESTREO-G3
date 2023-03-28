@@ -11,7 +11,7 @@ from PyQt5.QtWidgets import QCheckBox
 
 # Project modules
 from src.ui.mainwindow import Ui_MainWindow
-from src.MPLClases import ScopePlot , TauPlot
+from src.MPLClases import ScopePlot , TauPlot , MultipleViews
 from src.cuentas import System
 
 class MainWindow(QMainWindow, Ui_MainWindow):
@@ -23,7 +23,11 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         ##asigno una clase para los layouts
 
         self.Scope  = ScopePlot(self.layout_scopeTemp)
+
         self.Tau = TauPlot(self.layout_osc)
+
+        self.multipleViews = MultipleViews(self.layout_views)
+
         self.system = System()
         
 
@@ -49,6 +53,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         #boton de graficar 
 
         self.button_plot.clicked.connect(self.plotGraphs)
+        self.button_plot_multiple.clicked.connect(self.plotMultipleGraphs)
  
 
 
@@ -180,6 +185,49 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
 ##    lo que pasa uando apretas el boton de graficar
     
+
+    def plotMultipleGraphs(self):
+
+        y , t = self.getUserFunction()
+        self.system.updateSignals(y,t,self.getCheckList())
+        self.system.updateStages(1e3,3,2e3,40,"cheby2",self.dial_fs.value(),(self.dial_duty.value())/100)
+
+        node_1 = self.combo_node_1.currentText()
+        value_1 = [0,0]
+        if node_1 == 'Xin':
+            value_1 = self.system.getXin()
+        if node_1 == 'Node1':
+            value_1 =self.system.getNode_1()
+        if node_1 == 'Node2':
+            value_1 =self.system.getNode_2()
+        if node_1 == 'Node3':
+            value_1 =self.system.getNode_3()
+        if node_1 == 'Node4':
+            value_1 =self.system.getNode_4()
+
+        node_2 = self.combo_node_2.currentText()
+        value_2 = [0,0]
+        if node_2 == 'Xin':
+            value_2 = self.system.getXin()
+        if node_2 == 'Node1':
+            value_2 =self.system.getNode_1()
+        if node_2 == 'Node2':
+            value_2 =self.system.getNode_2()
+        if node_2 == 'Node3':
+            value_2 =self.system.getNode_3()
+        if node_2 == 'Node4':
+            value_2 =self.system.getNode_4()
+
+
+
+
+
+
+        self.multipleViews.plot(value_1[0] , value_2[0] , value_1[1])
+        self.Tau.plot((self.dial_duty.value())/100)
+        return
+
+
 
 
     def plotGraphs(self):

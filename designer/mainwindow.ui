@@ -593,7 +593,7 @@
        </font>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>1</number>
       </property>
       <widget class="QWidget" name="tab">
        <attribute name="title">
@@ -653,9 +653,122 @@
           <property name="frameShadow">
            <enum>QFrame::Raised</enum>
           </property>
-          <layout class="QHBoxLayout" name="horizontalLayout_11">
+          <layout class="QHBoxLayout" name="horizontalLayout_9">
+           <item>
+            <widget class="QFrame" name="frame_16">
+             <property name="minimumSize">
+              <size>
+               <width>100</width>
+               <height>100</height>
+              </size>
+             </property>
+             <property name="maximumSize">
+              <size>
+               <width>100</width>
+               <height>100</height>
+              </size>
+             </property>
+             <property name="frameShape">
+              <enum>QFrame::StyledPanel</enum>
+             </property>
+             <property name="frameShadow">
+              <enum>QFrame::Raised</enum>
+             </property>
+             <layout class="QVBoxLayout" name="verticalLayout_5">
+              <item>
+               <widget class="QComboBox" name="combo_node_1">
+                <property name="minimumSize">
+                 <size>
+                  <width>80</width>
+                  <height>20</height>
+                 </size>
+                </property>
+                <property name="maximumSize">
+                 <size>
+                  <width>80</width>
+                  <height>20</height>
+                 </size>
+                </property>
+                <item>
+                 <property name="text">
+                  <string>Xin</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>Node1</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>Node2</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>Node3</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>Node4</string>
+                 </property>
+                </item>
+               </widget>
+              </item>
+              <item>
+               <widget class="QPushButton" name="button_plot_multiple">
+                <property name="text">
+                 <string>Plot</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </widget>
+           </item>
            <item>
             <layout class="QHBoxLayout" name="layout_views"/>
+           </item>
+           <item>
+            <widget class="QComboBox" name="combo_node_2">
+             <property name="minimumSize">
+              <size>
+               <width>80</width>
+               <height>20</height>
+              </size>
+             </property>
+             <property name="maximumSize">
+              <size>
+               <width>80</width>
+               <height>20</height>
+              </size>
+             </property>
+             <item>
+              <property name="text">
+               <string>Xin</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Node1</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Node2</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Node3</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Node4</string>
+              </property>
+             </item>
+            </widget>
            </item>
           </layout>
          </widget>

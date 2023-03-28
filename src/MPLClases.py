@@ -70,10 +70,14 @@ class ScopePlot(MplCanvas):
 
 
 
+        
 
 
 
-class MplCanvas_tau(FigureCanvas):
+
+
+
+class MplCanvas_single(FigureCanvas):
     """
         MplCanvas
     """
@@ -81,14 +85,14 @@ class MplCanvas_tau(FigureCanvas):
         self.fig = Figure()
 
         super().__init__(self.fig)
-        self.axes_tau = self.fig.add_subplot()
+        self.axes = self.fig.add_subplot()
         self.fig.set_tight_layout(True)
 
         parent.layout().addWidget(self)
 
 
 
-class TauPlot(MplCanvas_tau):
+class TauPlot(MplCanvas_single):
     """
         TauPlot
     """
@@ -99,7 +103,7 @@ class TauPlot(MplCanvas_tau):
     def plot(self,DC):
 
 
-        self.axes_tau.clear()
+        self.axes.clear()
 
 
 
@@ -119,11 +123,28 @@ class TauPlot(MplCanvas_tau):
         pulse2 = np.zeros_like(time)
         pulse2[(time >= start_time) & (time <= start_time + DC/10)] = amplitude
         # Create the plot
-        self.axes_tau.plot(time, pulse,color = 'k')
-        self.axes_tau.plot(time,pulse2, color='m')
-        self.axes_tau.set_xticklabels([])
+        self.axes.plot(time, pulse,color = 'k')
+        self.axes.plot(time,pulse2, color='m')
+        self.axes.set_xticklabels([])
 
-        self.axes_tau.set_xlabel('Time')
-        self.axes_tau.set_ylabel('Amplitude')
-        self.axes_tau.set_title('Pulse')
+        self.axes.set_xlabel('Time')
+        self.axes.set_ylabel('Amplitude')
+        self.axes.set_title('Pulse')
+        self.fig.canvas.draw()
+
+
+class MultipleViews(MplCanvas_single):
+
+    def __init__(self, parent=None):
+        if parent is not None:
+            super().__init__(parent)
+        
+    def plot(self,y_1, y_2 , t_in):
+        self.axes.clear()
+        self.axes.plot(t_in,y_1,color='g', label = "Signal 1")
+        self.axes.plot(t_in,y_2,'-b' , label = 'Signal 2')
+        self.axes.set_xlabel('Time')
+        self.axes.set_ylabel('Amplitude')
+        self.axes.set_title('Compare')
+        self.axes.set_xticklabels([])
         self.fig.canvas.draw()
