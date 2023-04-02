@@ -1,3 +1,9 @@
+#devolver seniales 
+import numpy as np
+from numpy import pi
+import scipy.signal as signal
+
+
 # PyQt5 modules
 from PyQt5.QtWidgets import QMainWindow
 from PyQt5.QtWidgets import QMessageBox
@@ -5,13 +11,29 @@ from PyQt5.QtWidgets import QCheckBox
 
 # Project modules
 from src.ui.mainwindow import Ui_MainWindow
-
+from src.MPLClases import ScopePlot , TauPlot , MultipleViews
+from src.cuentas import System
 
 class MainWindow(QMainWindow, Ui_MainWindow):
 
     def __init__(self):
         super(MainWindow, self).__init__()
         self.setupUi(self)
+
+        ##asigno una clase para los layouts
+
+        self.Scope  = ScopePlot(self.layout_scopeTemp)
+
+        self.Tau = TauPlot(self.layout_osc)
+
+        self.multipleViews = MultipleViews(self.layout_views)
+
+        self.system = System()
+        
+
+
+
+
 
         self.text_fs.textChanged.connect(self.changeSamplingDial)
         self.dial_fs.valueChanged.connect(self.changeSamplingText)
@@ -26,7 +48,38 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.check_analogswitch.stateChanged.connect(self.changeCheckBoxColor2)
         self.check_fr.stateChanged.connect(self.changeCheckBoxColor3)
         self.check_sh.stateChanged.connect(self.changeCheckBoxColor4)
+
+
+        #boton de graficar 
+
+        self.button_plot.clicked.connect(self.plotGraphs)
+        self.button_plot_multiple.clicked.connect(self.plotMultipleGraphs)
  
+
+
+
+
+
+## defino la funcion que me plotea en el scope 
+# """ 
+#     def plotScope(self):
+#         node = self.getNode()
+#         if node == 0:
+#             value = self.system.getXin()
+#         if node == 1:
+#             value =self.system.getNode_1()
+#         if node == 2:
+#             value =self.system.getNode_2()
+#         if node == 3:
+#             value =self.system.getNode_3()
+#         if node == 4:
+#             value =self.system.getNode_4()
+
+#         self.Scope.plot(value[0],value[1])
+#         return
+
+#  """
+
 
     def changeSamplingDial(self,freqValueText):
        freqT = self.strToInt(freqValueText) 
@@ -120,4 +173,137 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         return
     
 
+
+
+
+
+
+
+
+
+
+
+##    lo que pasa uando apretas el boton de graficar
     
+
+    def plotMultipleGraphs(self):
+
+        y , t = self.getUserFunction()
+        self.system.updateSignals(y,t,self.getCheckList())
+        self.system.updateStages(1e3,3,2e3,40,"cheby2",self.dial_fs.value(),(self.dial_duty.value())/100)
+
+        node_1 = self.combo_node_1.currentText()
+        value_1 = [0,0]
+        if node_1 == 'Xin':
+            value_1 = self.system.getXin()
+        if node_1 == 'Node1':
+            value_1 =self.system.getNode_1()
+        if node_1 == 'Node2':
+            value_1 =self.system.getNode_2()
+        if node_1 == 'Node3':
+            value_1 =self.system.getNode_3()
+        if node_1 == 'Node4':
+            value_1 =self.system.getNode_4()
+
+        node_2 = self.combo_node_2.currentText()
+        value_2 = [0,0]
+        if node_2 == 'Xin':
+            value_2 = self.system.getXin()
+        if node_2 == 'Node1':
+            value_2 =self.system.getNode_1()
+        if node_2 == 'Node2':
+            value_2 =self.system.getNode_2()
+        if node_2 == 'Node3':
+            value_2 =self.system.getNode_3()
+        if node_2 == 'Node4':
+            value_2 =self.system.getNode_4()
+
+
+
+
+
+
+        self.multipleViews.plot(value_1[0] , value_2[0] , value_1[1])
+        self.Tau.plot((self.dial_duty.value())/100)
+        return
+
+
+
+
+    def plotGraphs(self):
+        y , t = self.getUserFunction()
+        self.system.updateSignals(y,t,self.getCheckList())
+        self.system.updateStages(1e3,3,2e3,40,"cheby2",self.dial_fs.value(),(self.dial_duty.value())/100)
+
+        node = self.getNode()
+        value = [0,0]
+        if node == "Xin":
+            value = self.system.getXin()
+        if node == "Node1":
+            value =self.system.getNode_1()
+        if node == "Node2":
+            value =self.system.getNode_2()
+        if node == "Node3":
+            value =self.system.getNode_3()
+        if node == "Node4":
+            value =self.system.getNode_4()
+
+        self.Scope.plot(value[0],value[1])
+        self.Tau.plot((self.dial_duty.value())/100)
+        return
+        return
+
+
+    def getCheckList(self):
+        checklist = {"Filtro AA": self.check_FAA.isChecked() ,
+                     "Sample and Hold": self.check_sh.isChecked(),
+                     "Analog Switch":self.check_analogswitch.isChecked(),
+                     "Filter":self.check_fr.isChecked()}
+        return checklist
+    
+
+
+
+    def getNode(self):
+                
+        ##son los nodos , no checkbox
+        NodeList = {
+
+            "Xin": self.radio_Xin.isChecked()   ,
+            "Node1": self.radio_node1.isChecked()  , 
+            "Node2": self.radio_node2.isChecked()    ,
+            "Node3": self.radio_node3.isChecked()  , 
+            "Node4": self.radio_node4.isChecked()  , 
+
+
+        } 
+        
+
+        for index in NodeList:
+            if(NodeList[index]):
+                return index
+            
+
+
+    def getUserFunction(self):
+
+        t = np.linspace(0,1,1000)
+        fb = self.freq_xinSlider.value()
+
+        SignalList = {
+
+            "Sin": np.sin(2*pi*fb*t) ,
+
+            "Square":  np.square(2*pi*fb*t)   ,
+
+            "Triangle": signal.sawtooth(2 * np.pi * 5 * t, 0.5) ,
+
+            "Saw Tooth":   signal.sawtooth(2 * np.pi * 5 * t, 0.2)
+
+
+        }
+
+
+
+        y = SignalList[self.XinSelect.currentText()] 
+        return y,t
