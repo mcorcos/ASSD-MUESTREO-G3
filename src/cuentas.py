@@ -4,17 +4,9 @@ import scipy.signal as ss
 import matplotlib.pyplot as plt
 
 
-
-
-
-
-
-
-
-
 class Filter:
     """
-    AntiAliasFilter:
+    Filter:
 
     
     """
@@ -60,7 +52,7 @@ class Filter:
     
     def getTempResponse(self, y,t):
         t_out, y_out, x_out = ss.lsim(self.transferFunc, y, t)
-        return [ y_out , t_out]
+        return [y_out, t_out]
 
 
 ######################################################
@@ -103,8 +95,12 @@ class Filter:
 
 
 
+class SampleAndHold:
+    """
+    sampleAndHold:
 
-class sampleAndHold:
+    
+    """
     def __init__(self):
         self.fs=1e3
 
@@ -123,7 +119,11 @@ class sampleAndHold:
                 sampledSignal[i]=sampledSignal[i-1]
         return [sampledSignal,t_in]
 
-class analogSwitch:
+class AnalogSwitch:
+    """
+    analog Switch
+
+    """
     def __init__(self):
         self.fs=1e3
         self.DC=0.5
@@ -152,11 +152,14 @@ class analogSwitch:
 
 
 class System:
+    """
+    System
+    """
     def __init__(self):
         
         self.FAA = Filter()
-        self.SH = sampleAndHold()
-        self.AnalogSwitch = analogSwitch()
+        self.SH = SampleAndHold()
+        self.AnalogSwitch = AnalogSwitch()
         self.FR = Filter()
 
 
@@ -167,23 +170,21 @@ class System:
         self.Node_4 = [0,0]
 
 
+    def updateStages(self, fp, ap, fa, aa, aprox, fs, DC):
 
-
-
-    def updateStages(self,fp,ap,fa,aa,aprox,fs,DC):
-        self.FAA.updateFilter(fp,ap,fa,aa,aprox)
+        self.FAA.updateFilter(fp, ap, fa, aa, aprox)
         self.SH.updateSH(fs)
-        self.AnalogSwitch.updateSwitch(DC,fs)
-        self.FR.updateFilter(fp,ap,fa,aa,aprox)
+        self.AnalogSwitch.updateSwitch(DC, fs)
+        self.FR.updateFilter(fp, ap, fa, aa, aprox)
 
 
-    def updateSignals(self,y_in,t_in ,checkList):
+    def updateSignals(self, y_in, t_in, checkList):
         
-        self.Xin = [y_in,t_in]
+        self.Xin = [y_in, t_in]
 
 
         if checkList["Filtro AA"]:
-            self.Node_1= self.FAA.getTempResponse( self.Xin[0],self.Xin[1])
+            self.Node_1= self.FAA.getTempResponse(self.Xin[0], self.Xin[1])
         else:
             self.Node_1 = self.Xin
 
@@ -206,7 +207,9 @@ class System:
         else:
             self.Node_4 = self.Node_3
 
-
+    """
+    Signal getters
+    """
     def getXin(self):
         return self.Xin
     

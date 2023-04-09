@@ -14,15 +14,23 @@ from src.ui.mainwindow import Ui_MainWindow
 from src.MPLClases import ScopePlot , TauPlot , MultipleViews
 from src.cuentas import System
 
+mul = {
+    'Hz' : 1,
+    'KHz' : 10**3,
+    'MHz' : 10**6,
+    'GHz' : 10**9,
+    'THz' : 10**12
+}
+
 class MainWindow(QMainWindow, Ui_MainWindow):
 
     def __init__(self):
         super(MainWindow, self).__init__()
         self.setupUi(self)
 
-        ##asigno una clase para los layouts
+        # asigno una clase para los layouts
 
-        self.Scope  = ScopePlot(self.layout_scopeTemp)
+        self.Scope  = ScopePlot(self.scopePlot)
 
         self.Tau = TauPlot(self.layout_osc)
 
@@ -31,9 +39,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.system = System()
         
 
-
-
-
+        # Eventos
 
         self.text_fs.textChanged.connect(self.changeSamplingDial)
         self.dial_fs.valueChanged.connect(self.changeSamplingText)
@@ -41,8 +47,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.text_duty.textChanged.connect(self.changeDutyDial)
         self.dial_duty.valueChanged.connect(self.changeDutyText)
 
-        self.freq_xin.textChanged.connect(self.changeSignalSlider)
-        self.freq_xinSlider.sliderMoved.connect(self.changeSignalText)
+        '''self.freq_xin.textChanged.connect(self.changeSignalSlider)
+        self.freq_xinSlider.sliderMoved.connect(self.changeSignalText)'''
 
         self.check_FAA.stateChanged.connect(self.changeCheckBoxColor1)
         self.check_analogswitch.stateChanged.connect(self.changeCheckBoxColor2)
@@ -50,14 +56,11 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.check_sh.stateChanged.connect(self.changeCheckBoxColor4)
 
 
-        #boton de graficar 
+        # Botón de graficar 
 
         self.button_plot.clicked.connect(self.plotGraphs)
         self.button_plot_multiple.clicked.connect(self.plotMultipleGraphs)
  
-
-
-
 
 
 ## defino la funcion que me plotea en el scope 
@@ -80,10 +83,12 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
 #  """
 
-
-    def changeSamplingDial(self,freqValueText):
-       freqT = self.strToInt(freqValueText) 
-       self.dial_fs.setValue(freqT) 
+    """
+    Eventos
+    """
+    def changeSamplingDial(self, freqValueText):
+       freqT = int(np.round(self.strToFloat(freqValueText)))
+       self.dial_fs.setValue(freqT)
 
     def changeSamplingText(self, freqValueDial):
         freqD = str(freqValueDial)
@@ -91,19 +96,19 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
     def changeDutyDial(self,dutyValueText):
        dutyT = self.strToInt(dutyValueText) 
-       self.dial_duty.setValue(dutyT) 
+       self.dial_duty.setValue(dutyT)
 
     def changeDutyText(self, dutyValueDial): 
         dutyD = str(dutyValueDial)
         self.text_duty.setText(dutyD)
 
-    def changeSignalSlider(self, signalText):
+    '''def changeSignalSlider(self, signalText):
         signalT = self.strToInt(signalText)
         self.freq_xinSlider.setValue(signalT)
 
     def changeSignalText(self, signalSlider):
         signalS = str(signalSlider)
-        self.freq_xin.setText(signalS)
+        self.freq_xin.setText(signalS)'''
 
 
     def changeCheckBoxColor1 (self):
@@ -133,8 +138,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         else: 
             self.check_sh.setStyleSheet("color: red")
-
-
 
     def strToInt(self, string):
         res = 0
@@ -172,20 +175,12 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         msgBox.exec()
         return
     
+    """
 
+    Lo que pasa uando apretas el boton de graficar
 
-
-
-
-
-
-
-
-
-
-##    lo que pasa uando apretas el boton de graficar
+    """     
     
-
     def plotMultipleGraphs(self):
 
         y , t = self.getUserFunction()
@@ -219,21 +214,17 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             value_2 =self.system.getNode_4()
 
 
-
-
-
-
         self.multipleViews.plot(value_1[0] , value_2[0] , value_1[1])
         self.Tau.plot((self.dial_duty.value())/100)
         return
 
 
 
-
     def plotGraphs(self):
-        y , t = self.getUserFunction()
-        self.system.updateSignals(y,t,self.getCheckList())
-        self.system.updateStages(1e3,3,2e3,40,"cheby2",self.dial_fs.value(),(self.dial_duty.value())/100)
+        y, t = self.getUserFunction()
+        self.system.updateSignals(y, t, self.getCheckList())
+        self.system.updateStages(1e3, 3, 2e3, 40, "cheby2", self.dial_fs.value(),
+                                 (self.dial_duty.value())/100)
 
         node = self.getNode()
         value = [0,0]
@@ -263,7 +254,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     
 
 
-
     def getNode(self):
                 
         ##son los nodos , no checkbox
@@ -284,26 +274,28 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 return index
             
 
-
     def getUserFunction(self):
 
         t = np.linspace(0,1,1000)
-        fb = self.freq_xinSlider.value()
+        fb = self.strToFloat(self.signalFrequency.text())
+        A = self.strToFloat(self.signalAmplitude.text())
+        pha = self.strToFloat(self.signalPhase.text())
+        dut = self.strToFloat(self.signalDuty.text())
+        off = self.strToFloat(self.signalOffset.text())
 
-        SignalList = {
+        if self.XinSelect.currentText() == "Sin":
+            y = A * np.sin(2 * pi * fb * t + pha) + off
 
-            "Sin": np.sin(2*pi*fb*t) ,
+        elif self.XinSelect.currentText() == "Square":
+            y = A * np.square(2*pi*fb*t + pha, duty = dut) + off
 
-            "Square":  np.square(2*pi*fb*t)   ,
+        elif self.XinSelect.currentText() == "Triangle":
+            y = A * self.signalAmplitude*signal.sawtooth(2 * np.pi * fb * t + pha, width = dut) + off
 
-            "Triangle": signal.sawtooth(2 * np.pi * 5 * t, 0.5) ,
+        elif self.XinSelect.currentText() == "Saw Tooth":
+            y = A * signal.sawtooth(2 * np.pi * fb * t + pha, width = 1)
 
-            "Saw Tooth":   signal.sawtooth(2 * np.pi * 5 * t, 0.2)
+        else:
+            print("Mismatch between signals")
 
-
-        }
-
-
-
-        y = SignalList[self.XinSelect.currentText()] 
-        return y,t
+        return y, t
