@@ -1,7 +1,7 @@
 #devolver seniales 
 import numpy as np
 from numpy import pi
-import scipy.signal as signal
+import scipy.signal as ss
 
 
 # PyQt5 modules
@@ -183,9 +183,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     
     def plotMultipleGraphs(self):
 
-        y , t = self.getUserFunction()
-        self.system.updateSignals(y,t,self.getCheckList())
-        self.system.updateStages(1e3,3,2e3,40,"cheby2",self.dial_fs.value(),(self.dial_duty.value())/100)
+        self.update()
+
+        dut = self.strToFloat(self.text_duty.text()) / 100
 
         node_1 = self.combo_node_1.currentText()
         value_1 = [0,0]
@@ -215,16 +215,16 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
 
         self.multipleViews.plot(value_1[0] , value_2[0] , value_1[1])
-        self.Tau.plot((self.dial_duty.value())/100)
+        self.Tau.plot(dut)
         return
 
 
 
     def plotGraphs(self):
-        y, t = self.getUserFunction()
-        self.system.updateSignals(y, t, self.getCheckList())
-        self.system.updateStages(1e3, 3, 2e3, 40, "cheby2", self.dial_fs.value(),
-                                 (self.dial_duty.value())/100)
+
+        self.update()
+
+        dut = self.strToFloat(self.text_duty.text()) / 100
 
         node = self.getNode()
         value = [0,0]
@@ -239,10 +239,26 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         if node == "Node4":
             value =self.system.getNode_4()
 
-        self.Scope.plot(value[0],value[1])
-        self.Tau.plot((self.dial_duty.value())/100)
-        return
-        return
+        
+
+        self.Scope.plot(value[0], value[1])
+        self.Tau.plot(dut)
+
+    def update(self):
+        y, t = self.getUserFunction()
+
+        fp = 20e3
+        ap = 1
+        fa = 2*fp
+        aa = 40
+
+        fs = self.strToFloat(self.text_fs.text()) * mul[self.mulBox1.currentText()]
+        dut = self.strToFloat(self.text_duty.text()) / 100
+
+        self.system.updateStages(fp, ap, fa, aa, "ellip", fs, dut)
+
+        self.system.updateSignals(y, t, self.getCheckList())
+
 
 
     def getCheckList(self):
@@ -259,16 +275,14 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         ##son los nodos , no checkbox
         NodeList = {
 
-            "Xin": self.radio_Xin.isChecked()   ,
-            "Node1": self.radio_node1.isChecked()  , 
-            "Node2": self.radio_node2.isChecked()    ,
-            "Node3": self.radio_node3.isChecked()  , 
-            "Node4": self.radio_node4.isChecked()  , 
-
+            "Xin": self.radio_Xin_1.isChecked(),
+            "Node1": self.radio_node1_1.isChecked(), 
+            "Node2": self.radio_node2_1.isChecked(),
+            "Node3": self.radio_node3_1.isChecked(), 
+            "Node4": self.radio_node4_1.isChecked(), 
 
         } 
         
-
         for index in NodeList:
             if(NodeList[index]):
                 return index
@@ -276,24 +290,27 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
     def getUserFunction(self):
 
-        t = np.linspace(0,1,1000)
-        fb = self.strToFloat(self.signalFrequency.text())
+        Nperiods = 10
+
+        fb = self.strToFloat(self.signalFrequency.text()) * mul[self.mulBoxSignal_3.currentText()]
         A = self.strToFloat(self.signalAmplitude.text())
         pha = self.strToFloat(self.signalPhase.text())
-        dut = self.strToFloat(self.signalDuty.text())
+        dut = self.strToFloat(self.signalDuty.text()) / 100
         off = self.strToFloat(self.signalOffset.text())
 
+        t = np.linspace(0, Nperiods*1/fb, 1000)
+
         if self.XinSelect.currentText() == "Sin":
-            y = A * np.sin(2 * pi * fb * t + pha) + off
+            y = A * np.sin(2 * np.pi * fb * t + pha) + off
 
         elif self.XinSelect.currentText() == "Square":
-            y = A * np.square(2*pi*fb*t + pha, duty = dut) + off
+            y = A * ss.square(2 * np.pi * fb * t + pha, duty = dut) + off
 
         elif self.XinSelect.currentText() == "Triangle":
-            y = A * self.signalAmplitude*signal.sawtooth(2 * np.pi * fb * t + pha, width = dut) + off
+            y = A * ss.sawtooth(2 * np.pi * fb * t + pha, width = dut) + off
 
         elif self.XinSelect.currentText() == "Saw Tooth":
-            y = A * signal.sawtooth(2 * np.pi * fb * t + pha, width = 1)
+            y = A * ss.sawtooth(2 * np.pi * fb * t + pha, width = 1) + off
 
         else:
             print("Mismatch between signals")

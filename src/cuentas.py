@@ -1,7 +1,6 @@
 import numpy as np
 from numpy import pi
 import scipy.signal as ss
-import matplotlib.pyplot as plt
 
 
 class Filter:
@@ -107,17 +106,17 @@ class SampleAndHold:
     def updateSH(self, fs):
         self.fs = fs
 
-    def getSampledSignal(self,y_in,t_in):
-        sampledSignal=np.zeros(len(t_in))
-        sampleT=1/self.fs
-        timeInterval=t_in[1]-t_in[0]
-        index=np.rint(sampleT/timeInterval)
+    def getSampledSignal(self, y_in, t_in):
+        sampledSignal = np.zeros(len(t_in))
+        sampleT = 1 / self.fs
+        timeInterval = t_in[1] - t_in[0]
+        index = np.rint(sampleT / timeInterval)
         for i in range(len(t_in)):
-            if i%(index)==0:
-                sampledSignal[i]=y_in[i]
+            if i % (index) == 0:
+                sampledSignal[i] = y_in[i]
             else:
-                sampledSignal[i]=sampledSignal[i-1]
-        return [sampledSignal,t_in]
+                sampledSignal[i] = sampledSignal[i-1]
+        return [sampledSignal, t_in]
 
 class AnalogSwitch:
     """
@@ -125,30 +124,29 @@ class AnalogSwitch:
 
     """
     def __init__(self):
-        self.fs=1e3
-        self.DC=0.5
-        self.tau=self.DC*1/self.fs
-        self.state=True
+        self.fs = 1e3
+        self.DC = 0.5
+        self.tau = self.DC*1/self.fs
+        self.state = True
 
 
     def updateSwitch(self,DC,fs):
-        self.fs=fs
-        self.DC=DC
+        self.fs = fs
+        self.DC = DC
 
     def getResampleSignal(self,y_in,t_in):
-        resampledSignal=np.zeros(len(t_in))
-        turnOffT=1/self.fs
-        timeInterval=t_in[1]-t_in[0]
-        T_index=np.rint(turnOffT/timeInterval)
-        DC_index=np.rint(turnOffT/timeInterval*self.DC)
+        resampledSignal = np.zeros(len(t_in))
+        turnOffT = 1 / self.fs
+        timeInterval = t_in[1] - t_in[0]
+        T_index = np.rint(turnOffT / timeInterval)
+        DC_index = np.rint(turnOffT / timeInterval*self.DC)
         for i in range(len(t_in)):
-            if (i%T_index)<DC_index:
-                resampledSignal[i]=y_in[i]
+            if (i % T_index) < DC_index:
+                resampledSignal[i] = y_in[i]
             else:
-                resampledSignal[i]=0
-        return [resampledSignal,t_in]
+                resampledSignal[i] =  0
+        return [resampledSignal, t_in]
         
-
 
 
 class System:
@@ -164,10 +162,19 @@ class System:
 
 
         self.Xin = [0,0]
+        self.XinSpectrum = [0,0]
+
         self.Node_1 = [0,0]
+        self.Node_1_Spectrum = [0,0]
+
         self.Node_2 = [0,0]
+        self.Node_2_Spectrum = [0,0]
+
         self.Node_3 = [0,0]
+        self.Node_3_Spectrum = [0,0]
+
         self.Node_4 = [0,0]
+        self.Node_4_Spectrum = [0,0]
 
 
     def updateStages(self, fp, ap, fa, aa, aprox, fs, DC):
@@ -201,11 +208,18 @@ class System:
             self.Node_3 = self.Node_2
 
 
-
         if checkList["Filter"]:
             self.Node_4= self.FR.getTempResponse( self.Node_3[0],self.Node_3[1])
         else:
             self.Node_4 = self.Node_3
+
+        updateSpectrums()
+
+    def updateSpectrums(self):
+        t, y = self.Xin
+        yf = ss.fft.fft(y)
+
+
 
     """
     Signal getters

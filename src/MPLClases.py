@@ -21,9 +21,9 @@ class MplCanvas(FigureCanvas):
         self.axes2 = self.fig.add_subplot(122)
         self.navToolBar = NavigationToolbar(self, parent)
 
-        parent.layout().addWidget(self)
         parent.layout().addWidget(self.navToolBar)
-        
+        parent.layout().addWidget(self)
+
         self.fig.set_tight_layout(True)
 
 class ScopePlot(MplCanvas):
@@ -39,7 +39,7 @@ class ScopePlot(MplCanvas):
 #graficos en el tiempo
 
         self.axes.clear()
-        self.axes.plot(t_in,y_in,color='r')
+        self.axes.plot(t_in, y_in, color='r')
 
 
         self.axes2.clear()

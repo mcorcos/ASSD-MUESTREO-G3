@@ -119,6 +119,12 @@
                     </item>
                     <item>
                      <widget class="QComboBox" name="mulBoxSignal_3">
+                      <property name="minimumSize">
+                       <size>
+                        <width>50</width>
+                        <height>0</height>
+                       </size>
+                      </property>
                       <item>
                        <property name="text">
                         <string>Hz</string>
@@ -457,62 +463,6 @@
          </widget>
         </item>
         <item>
-         <widget class="QFrame" name="frame_15">
-          <property name="maximumSize">
-           <size>
-            <width>16777215</width>
-            <height>100</height>
-           </size>
-          </property>
-          <property name="frameShape">
-           <enum>QFrame::StyledPanel</enum>
-          </property>
-          <property name="frameShadow">
-           <enum>QFrame::Raised</enum>
-          </property>
-          <layout class="QHBoxLayout" name="horizontalLayout_2">
-           <item>
-            <widget class="QRadioButton" name="radio_Xin">
-             <property name="text">
-              <string>Xin(t)</string>
-             </property>
-             <property name="checked">
-              <bool>true</bool>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QRadioButton" name="radio_node1">
-             <property name="text">
-              <string>Node1</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QRadioButton" name="radio_node2">
-             <property name="text">
-              <string>Node2</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QRadioButton" name="radio_node3">
-             <property name="text">
-              <string>Node3</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QRadioButton" name="radio_node4">
-             <property name="text">
-              <string>Xout</string>
-             </property>
-            </widget>
-           </item>
-          </layout>
-         </widget>
-        </item>
-        <item>
          <widget class="QFrame" name="frame_5">
           <property name="minimumSize">
            <size>
@@ -550,8 +500,14 @@
                   <height>16777215</height>
                  </size>
                 </property>
+                <property name="minimum">
+                 <number>1</number>
+                </property>
                 <property name="maximum">
                  <number>1000</number>
+                </property>
+                <property name="value">
+                 <number>50</number>
                 </property>
                </widget>
               </item>
@@ -586,6 +542,12 @@
                  </item>
                  <item>
                   <widget class="QComboBox" name="mulBox1">
+                   <property name="minimumSize">
+                    <size>
+                     <width>50</width>
+                     <height>0</height>
+                    </size>
+                   </property>
                    <property name="currentIndex">
                     <number>1</number>
                    </property>
@@ -621,13 +583,6 @@
               </item>
              </layout>
             </widget>
-           </item>
-           <item row="0" column="1">
-            <layout class="QVBoxLayout" name="layout_osc">
-             <property name="sizeConstraint">
-              <enum>QLayout::SetMaximumSize</enum>
-             </property>
-            </layout>
            </item>
            <item row="0" column="2">
             <widget class="QFrame" name="frame_7">
@@ -693,6 +648,17 @@
              </layout>
             </widget>
            </item>
+           <item row="0" column="1">
+            <widget class="QFrame" name="layout_osc">
+             <property name="frameShape">
+              <enum>QFrame::StyledPanel</enum>
+             </property>
+             <property name="frameShadow">
+              <enum>QFrame::Raised</enum>
+             </property>
+             <layout class="QVBoxLayout" name="verticalLayout_12"/>
+            </widget>
+           </item>
           </layout>
          </widget>
         </item>
@@ -733,8 +699,75 @@
            <attribute name="title">
             <string>Scope</string>
            </attribute>
-           <layout class="QHBoxLayout" name="horizontalLayout_7">
-            <item>
+           <layout class="QGridLayout" name="gridLayout_4">
+            <item row="0" column="1">
+             <widget class="QFrame" name="frame_15">
+              <property name="maximumSize">
+               <size>
+                <width>16777215</width>
+                <height>100</height>
+               </size>
+              </property>
+              <property name="frameShape">
+               <enum>QFrame::StyledPanel</enum>
+              </property>
+              <property name="frameShadow">
+               <enum>QFrame::Raised</enum>
+              </property>
+              <layout class="QHBoxLayout" name="horizontalLayout_7">
+               <item>
+                <widget class="QRadioButton" name="radio_Xin_1">
+                 <property name="text">
+                  <string>Xin(t)</string>
+                 </property>
+                 <property name="checked">
+                  <bool>true</bool>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QRadioButton" name="radio_node1_1">
+                 <property name="text">
+                  <string>Node1</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QRadioButton" name="radio_node2_1">
+                 <property name="text">
+                  <string>Node2</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QRadioButton" name="radio_node3_1">
+                 <property name="text">
+                  <string>Node3</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QRadioButton" name="radio_node4_1">
+                 <property name="text">
+                  <string>Xout</string>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </widget>
+            </item>
+            <item row="1" column="1">
+             <widget class="QFrame" name="scopePlot">
+              <property name="frameShape">
+               <enum>QFrame::StyledPanel</enum>
+              </property>
+              <property name="frameShadow">
+               <enum>QFrame::Raised</enum>
+              </property>
+              <layout class="QVBoxLayout" name="verticalLayout_10"/>
+             </widget>
+            </item>
+            <item row="1" column="0">
              <widget class="QPushButton" name="button_plot">
               <property name="minimumSize">
                <size>
@@ -751,17 +784,6 @@
               <property name="text">
                <string>Plot</string>
               </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QFrame" name="scopePlot">
-              <property name="frameShape">
-               <enum>QFrame::StyledPanel</enum>
-              </property>
-              <property name="frameShadow">
-               <enum>QFrame::Raised</enum>
-              </property>
-              <layout class="QHBoxLayout" name="horizontalLayout_12"/>
              </widget>
             </item>
            </layout>
@@ -853,7 +875,15 @@
                 </widget>
                </item>
                <item>
-                <layout class="QHBoxLayout" name="layout_views"/>
+                <widget class="QFrame" name="layout_views">
+                 <property name="frameShape">
+                  <enum>QFrame::StyledPanel</enum>
+                 </property>
+                 <property name="frameShadow">
+                  <enum>QFrame::Raised</enum>
+                 </property>
+                 <layout class="QVBoxLayout" name="verticalLayout_13"/>
+                </widget>
                </item>
                <item>
                 <widget class="QComboBox" name="combo_node_2">
