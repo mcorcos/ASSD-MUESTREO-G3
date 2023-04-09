@@ -1,12 +1,11 @@
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
-# NavigationToolbar2QT as NavigationToolbar
 from matplotlib.figure import Figure
+from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar
 import matplotlib.pyplot as plt
 import numpy as np
 
 import matplotlib.patches as mpatches
 from scipy.fft import fft
-
 
 
 
@@ -20,9 +19,12 @@ class MplCanvas(FigureCanvas):
         super().__init__(self.fig)
         self.axes = self.fig.add_subplot(121)
         self.axes2 = self.fig.add_subplot(122)
-        self.fig.set_tight_layout(True)
+        self.navToolBar = NavigationToolbar(self, parent)
 
         parent.layout().addWidget(self)
+        parent.layout().addWidget(self.navToolBar)
+        
+        self.fig.set_tight_layout(True)
 
 class ScopePlot(MplCanvas):
     """
