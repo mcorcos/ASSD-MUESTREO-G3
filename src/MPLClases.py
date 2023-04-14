@@ -34,27 +34,26 @@ class ScopePlot(MplCanvas):
         if parent is not None:
             super().__init__(parent)
 
-    def plot(self, y_in , t_in):    
 
-#graficos en el tiempo
+    def plot(self, y_in, t_in, amp_in, freq_in):    
 
+        # Gráficos en el tiempo
         self.axes.clear()
+        self.axes.grid(which='major', axis='both')
         self.axes.plot(t_in, y_in, color='r')
 
-
+        # Gráficos en frecuencia
         self.axes2.clear()
         # Compute the one-dimensional discrete Fourier Transform.
 
-        fft_wave = np.fft.fft(y_in)
+        # fft_wave = np.fft.fft(y_in)
 
         # Compute the Discrete Fourier Transform sample frequencies.
 
-        fft_fre = np.fft.fftfreq(n=y_in.size, d=1/100)
+        # fft_fre = np.fft.fftfreq(n=y_in.size, d=1/100)
 
-        self.axes2.plot(fft_fre, fft_wave.real, label="Real part")
-        self.axes2.set_xlim(0,50)
-        self.axes2.set_ylim(-20,20)
-        self.axes2.legend(loc=1)
+        self.axes2.plot(freq_in, amp_in)
+        self.axes2.grid(which='major', axis='both')
         self.axes2.set_title("FFT in Frequency Domain")
 
         # # graficos en frecuencia
@@ -71,14 +70,6 @@ class ScopePlot(MplCanvas):
         self.fig.canvas.draw()
 
 
-
-        
-
-
-
-
-
-
 class MplCanvas_single(FigureCanvas):
     """
         MplCanvas
@@ -93,7 +84,6 @@ class MplCanvas_single(FigureCanvas):
         parent.layout().addWidget(self)
 
 
-
 class TauPlot(MplCanvas_single):
     """
         TauPlot
@@ -102,13 +92,10 @@ class TauPlot(MplCanvas_single):
         if parent is not None:
             super().__init__(parent)
 
-    def plot(self,DC):
+    def plot(self, DC):
 
 
         self.axes.clear()
-
-
-
 
         # Define the pulse parameters
         amplitude = 1.0
@@ -141,7 +128,7 @@ class MultipleViews(MplCanvas_single):
         if parent is not None:
             super().__init__(parent)
         
-    def plot(self,y_1, y_2 , t_in):
+    def plot(self, y_1, y_2 , t_in):
         self.axes.clear()
         self.axes.plot(t_in,y_1,color='g', label = "Signal 1")
         self.axes.plot(t_in,y_2,'-b' , label = 'Signal 2')

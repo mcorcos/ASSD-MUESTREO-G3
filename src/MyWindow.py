@@ -37,6 +37,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.multipleViews = MultipleViews(self.layout_views)
 
         self.system = System()
+
+        self.N = 1
+        self.T = 1
         
 
         # Eventos
@@ -190,36 +193,35 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         node_1 = self.combo_node_1.currentText()
         value_1 = [0,0]
         if node_1 == 'Xin':
-            value_1 = self.system.getXin()
+            value_1 = self.system.getXinSignal()
         if node_1 == 'Node1':
-            value_1 =self.system.getNode_1()
+            value_1 =self.system.getNode1Signal()
         if node_1 == 'Node2':
-            value_1 =self.system.getNode_2()
+            value_1 =self.system.getNode2Signal()
         if node_1 == 'Node3':
-            value_1 =self.system.getNode_3()
+            value_1 =self.system.getNode3Signal()
         if node_1 == 'Node4':
-            value_1 =self.system.getNode_4()
+            value_1 =self.system.getNode4Signal()
 
         node_2 = self.combo_node_2.currentText()
         value_2 = [0,0]
         if node_2 == 'Xin':
-            value_2 = self.system.getXin()
+            value_2 = self.system.getXinSignal()
         if node_2 == 'Node1':
-            value_2 =self.system.getNode_1()
+            value_2 =self.system.getNode1Signal()
         if node_2 == 'Node2':
-            value_2 =self.system.getNode_2()
+            value_2 =self.system.getNode2Signal()
         if node_2 == 'Node3':
-            value_2 =self.system.getNode_3()
+            value_2 =self.system.getNode3Signal()
         if node_2 == 'Node4':
-            value_2 =self.system.getNode_4()
+            value_2 =self.system.getNode4Signal()
 
 
         self.multipleViews.plot(value_1[0] , value_2[0] , value_1[1])
         self.Tau.plot(dut)
         return
 
-
-
+    # Grafica la señal marcada
     def plotGraphs(self):
 
         self.update()
@@ -229,21 +231,29 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         node = self.getNode()
         value = [0,0]
         if node == "Xin":
-            value = self.system.getXin()
+            value = self.system.getXinSignal()
+            spectrum = self.system.getXinSpectrum()
+
         if node == "Node1":
-            value =self.system.getNode_1()
+            value =self.system.getNode1Signal()
+            spectrum = self.system.getNode1Spectrum()
+            
         if node == "Node2":
-            value =self.system.getNode_2()
+            value =self.system.getNode2Signal()
+            spectrum = self.system.getNode2Spectrum()
+
         if node == "Node3":
-            value =self.system.getNode_3()
+            value =self.system.getNode3Signal()
+            spectrum = self.system.getNode3Spectrum()
+
         if node == "Node4":
-            value =self.system.getNode_4()
+            value =self.system.getNode4Signal()
+            spectrum = self.system.getNode4Spectrum()    
 
-        
-
-        self.Scope.plot(value[0], value[1])
+        self.Scope.plot(value[0], value[1], spectrum[0], spectrum[1])
         self.Tau.plot(dut)
 
+    # Update del sistema
     def update(self):
         y, t = self.getUserFunction()
 
@@ -257,7 +267,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         self.system.updateStages(fp, ap, fa, aa, "ellip", fs, dut)
 
-        self.system.updateSignals(y, t, self.getCheckList())
+        self.system.updateSignals(y, t, self.N, self.T, self.getCheckList())
 
 
 
@@ -298,7 +308,13 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         dut = self.strToFloat(self.signalDuty.text()) / 100
         off = self.strToFloat(self.signalOffset.text())
 
-        t = np.linspace(0, Nperiods*1/fb, 1000)
+        # Definimos un periodo de muestreo y cuánto tiempo se muestrea (ventana)
+        self.N = 1000   # número de muestras por periodo
+        T0 = 1/fb                   # periodo de la muestra
+        self.T = T0 / self.N        # espaciado entre muestras
+
+        # tomo Nperiods de la muestra
+        t = np.linspace(0, self.T * self.N * Nperiods, self.N * Nperiods, endpoint=False)
 
         if self.XinSelect.currentText() == "Sin":
             y = A * np.sin(2 * np.pi * fb * t + pha) + off

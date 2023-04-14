@@ -1,6 +1,7 @@
 import numpy as np
 from numpy import pi
 import scipy.signal as ss
+import scipy.fft as fft
 
 
 class Filter:
@@ -20,6 +21,9 @@ class Filter:
         self.aa = 40
 
         self.approx = "cheby2"      # [butter, cheby1, cheby2, ellip]
+
+        self.N = 1000               # cantidad de muestras por periodo
+        self.T = 1/1000
 
     def updateFilter(self, fp, ap, fa, aa, approx):
         """
@@ -185,7 +189,8 @@ class System:
         self.FR.updateFilter(fp, ap, fa, aa, aprox)
 
 
-    def updateSignals(self, y_in, t_in, checkList):
+    # Actualiza las señales en cada nodo
+    def updateSignals(self, y_in, t_in, N, T, checkList):
         
         self.Xin = [y_in, t_in]
 
@@ -213,28 +218,70 @@ class System:
         else:
             self.Node_4 = self.Node_3
 
-        updateSpectrums()
+        self.updateSpectrums(N, T)
 
-    def updateSpectrums(self):
-        t, y = self.Xin
-        yf = ss.fft.fft(y)
+    # Actualiza los espectros
+    def updateSpectrums(self, N, T):
+        # tengo que tomar un periodo de la señal
+        # T0 = N * T    es el periodo de la señal
 
+        self.N = N
+        self.T = T
 
+        y, t = (self.Xin[0][-N:], self.Xin[1][-N:])
+        yf = fft.fft(y)
+        self.XinSpectrum[1] = fft.fftfreq(N, T)[:N//2]
+        self.XinSpectrum[0] = 2.0/N * np.abs(yf[0:N//2])
+
+        y, t = (self.Node_1[0][-N:], self.Node_1[1][-N:])
+        yf = fft.fft(y)
+        self.Node_1_Spectrum[1] = fft.fftfreq(N, T)[:N//2]
+        self.Node_1_Spectrum[0] = 2.0/N * np.abs(yf[0:N//2])
+
+        y, t = (self.Node_2[0][-N:], self.Node_2[1][-N:])
+        yf = fft.fft(y)
+        self.Node_2_Spectrum[1] = fft.fftfreq(N, T)[:N//2]
+        self.Node_2_Spectrum[0] = 2.0/N * np.abs(yf[0:N//2])
+
+        y, t = (self.Node_3[0][-N:], self.Node_3[1][-N:])
+        yf = fft.fft(y)
+        self.Node_3_Spectrum[1] = fft.fftfreq(N, T)[:N//2]
+        self.Node_3_Spectrum[0] = 2.0/N * np.abs(yf[0:N//2])
+
+        y, t = (self.Node_4[0][-N:], self.Node_4[1][-N:])
+        yf = fft.fft(y)
+        self.Node_4_Spectrum[1] = fft.fftfreq(N, T)[:N//2]
+        self.Node_4_Spectrum[0] = 2.0/N * np.abs(yf[0:N//2])
 
     """
     Signal getters
     """
-    def getXin(self):
-        return self.Xin
+    def getXinSignal(self):
+        return (self.Xin[0][-5 * self.N:], self.Xin[1][-5 *self.N:])
     
-    def getNode_1(self):
-        return self.Node_1
+    def getNode1Signal(self):
+        return (self.Node_1[0][-5 * self.N:], self.Node_1[1][-5 *self.N:])
     
-    def getNode_2(self):
-        return self.Node_2
+    def getNode2Signal(self):
+        return (self.Node_2[0][-5 * self.N:], self.Node_2[1][-5 *self.N:])
     
-    def getNode_3(self):
-        return self.Node_3
+    def getNode3Signal(self):
+        return (self.Node_3[0][-5 * self.N:], self.Node_3[1][-5 *self.N:])
     
-    def getNode_4(self):
-        return self.Node_4
+    def getNode4Signal(self):
+        return (self.Node_4[0][-5 * self.N:], self.Node_4[1][-5 *self.N:])
+    
+    def getXinSpectrum(self):
+        return self.XinSpectrum
+    
+    def getNode1Spectrum(self):
+        return self.Node_1_Spectrum
+    
+    def getNode2Spectrum(self):
+        return self.Node_2_Spectrum
+    
+    def getNode3Spectrum(self):
+        return self.Node_3_Spectrum
+    
+    def getNode4Spectrum(self):
+        return self.Node_4_Spectrum
