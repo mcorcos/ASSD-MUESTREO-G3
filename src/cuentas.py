@@ -234,27 +234,27 @@ class System:
         # de la misma
 
         y, t = (self.Xin[0][-N:], self.Xin[1][-N:])
-        yf = fft.fft(y)
+        yf = fft.fft(y*ss.windows.hann(N))
         self.XinSpectrum[1] = fft.fftfreq(N, T)[:N//2]
         self.XinSpectrum[0] = 2.0/N * np.abs(yf[0:N//2])
 
         y, t = (self.Node_1[0][-N:], self.Node_1[1][-N:])
-        yf = fft.fft(y)
+        yf = fft.fft(y*ss.windows.hann(N))
         self.Node_1_Spectrum[1] = fft.fftfreq(N, T)[:N//2]
         self.Node_1_Spectrum[0] = 2.0/N * np.abs(yf[0:N//2])
 
         y, t = (self.Node_2[0][-N:], self.Node_2[1][-N:])
-        yf = fft.fft(y)
+        yf = fft.fft(y*ss.windows.hann(N))
         self.Node_2_Spectrum[1] = fft.fftfreq(N, T)[:N//2]
         self.Node_2_Spectrum[0] = 2.0/N * np.abs(yf[0:N//2])
 
         y, t = (self.Node_3[0][-N:], self.Node_3[1][-N:])
-        yf = fft.fft(y)
+        yf = fft.fft(y*ss.windows.hann(N))
         self.Node_3_Spectrum[1] = fft.fftfreq(N, T)[:N//2]
         self.Node_3_Spectrum[0] = 2.0/N * np.abs(yf[0:N//2])
 
         y, t = (self.Node_4[0][-N:], self.Node_4[1][-N:])
-        yf = fft.fft(y)
+        yf = fft.fft(y*ss.windows.hann(N))
         self.Node_4_Spectrum[1] = fft.fftfreq(N, T)[:N//2]
         self.Node_4_Spectrum[0] = 2.0/N * np.abs(yf[0:N//2])
 

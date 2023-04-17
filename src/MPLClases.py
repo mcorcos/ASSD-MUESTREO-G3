@@ -59,7 +59,7 @@ class ScopePlot(MplCanvas):
 
         self.axes2.grid(which='major', axis='both')
         self.axes2.set_title("FFT in Frequency Domain")
-        self.axes2.set_xlim(0, 150e3)
+        self.axes2.set_xlim(-10e3, 150e3)
 
 
         self.fig.canvas.draw()
