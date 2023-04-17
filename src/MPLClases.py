@@ -76,29 +76,34 @@ class TauPlot(MplCanvas_single):
         if parent is not None:
             super().__init__(parent)
 
-    def plot(self, DC):
+    def plot(self, DC, freq):
 
 
         self.axes.clear()
 
         # Define the pulse parameters
-        amplitude = 1.0
-        duration = 0.1
+        amplitude = 5.0
+        duration = 1 / (2*freq)
         start_time = 0.0
-        end_time = 0.2
+        end_time = 1 / freq
 
         # Define the x-axis values
-        time = np.linspace(start_time, end_time, 1000)
+        time = np.linspace(0, end_time, 1000)
+
+        start1 = end_time * 0.75
+        end1 = end_time * 0.25
+
+        start2 = (end_time - end_time * DC)/2
+        end2 = end_time - start2
 
         # Define the pulse function
         pulse = np.zeros_like(time)
-        pulse[(time >= start_time) & (time <= start_time + duration)] = amplitude
+        pulse[(time >= start1) | (time <= end1)] = amplitude
         pulse2 = np.zeros_like(time)
-        pulse2[(time >= start_time) & (time <= start_time + DC/10)] = amplitude
+        pulse2[(time >= start2) & (time <= end2)] = amplitude
         # Create the plot
         self.axes.plot(time, pulse,color = 'k')
         self.axes.plot(time,pulse2, color='m')
-        self.axes.set_xticklabels([])
 
         self.axes.set_xlabel('Time')
         self.axes.set_ylabel('Amplitude')

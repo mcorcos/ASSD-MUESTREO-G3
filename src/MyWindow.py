@@ -191,6 +191,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         dut = self.strToFloat(self.text_duty.text()) / 100
 
+        fs = self.strToFloat(self.text_fs.text()) * mul[self.mulBox1.currentText()]
+
         node_1 = self.combo_node_1.currentText()
         value_1 = [0,0]
         if node_1 == 'Xin':
@@ -219,7 +221,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
 
         self.multipleViews.plot(value_1[0] , value_2[0] , value_1[1])
-        self.Tau.plot(dut)
+        self.Tau.plot(dut, fs)
         return
 
     # Grafica la señal marcada
@@ -228,6 +230,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.update()
 
         dut = self.strToFloat(self.text_duty.text()) / 100
+        fs = self.strToFloat(self.text_fs.text()) * mul[self.mulBox1.currentText()]
 
         node = self.getNode()
         value = [0,0]
@@ -252,7 +255,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             spectrum = self.system.getNode4Spectrum()    
 
         self.Scope.plot(value[0], value[1], spectrum[0], spectrum[1])
-        self.Tau.plot(dut)
+        self.Tau.plot(dut, fs)
 
     # Update del sistema
     def update(self):
