@@ -35,7 +35,7 @@ class ScopePlot(MplCanvas):
             super().__init__(parent)
 
 
-    def plot(self, y_in, t_in, amp_in, freq_in):    
+    def plot(self, y_in, t_in, amp_in, freq_in, dB = False):    
 
         # Gráficos en el tiempo
         self.axes.clear()
@@ -45,7 +45,18 @@ class ScopePlot(MplCanvas):
         # Gráficos en frecuencia
         self.axes2.clear()
 
-        self.axes2.plot(freq_in, amp_in)
+        if not dB:
+            self.axes2.plot(freq_in, amp_in)
+        else:
+            new_amp = np.zeros(len(amp_in))
+            for i in range(len(amp_in)):
+                x = 20*np.log10(amp_in[i])
+                if x < -100:
+                    x = -100
+                new_amp[i] = x
+
+            self.axes2.plot(freq_in, new_amp)
+
         self.axes2.grid(which='major', axis='both')
         self.axes2.set_title("FFT in Frequency Domain")
         self.axes2.set_xlim(0, 150e3)

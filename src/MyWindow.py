@@ -252,9 +252,14 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         if node == "Node4":
             value =self.system.getNode4Signal()
-            spectrum = self.system.getNode4Spectrum()    
+            spectrum = self.system.getNode4Spectrum()
 
-        self.Scope.plot(value[0], value[1], spectrum[0], spectrum[1])
+        db = True
+
+        if self.linealButton.isChecked():
+            db = False
+
+        self.Scope.plot(value[0], value[1], spectrum[0], spectrum[1], db)
         self.Tau.plot(dut, fs)
 
     # Update del sistema
@@ -366,6 +371,11 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
             y = (1 + m * np.cos(2 * np.pi * fm * t)) * Amp * np.cos(2 * np.pi * fp * t)
 
+        elif self.XinSelect.currentText() == "Incomplete Sine":
+            y = np.zeros(len(t))
+            for i in range(len(y)):
+                y[i] = self.senoPartidoPeriodico(t[i], 3/2 *fb, 1/fb, A)
+
         else:
             print("Mismatch between signals")
 
@@ -376,3 +386,22 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.stackedWidget.setCurrentIndex(1)
         else:
             self.stackedWidget.setCurrentIndex(0)
+
+    def periodicf(self, li,lf,f,x,freq, a,Amp):
+        if x>=li and x<=lf :
+            return f(x,freq,a,Amp)
+        elif x>lf:
+            x_new=x-(lf-li)
+            return self.periodicf(li,lf,f,x_new, freq, a, Amp)
+        elif x<(li):
+            x_new=x+(lf-li)
+            return self.periodicf(li,lf,f,x_new, freq, a, Amp)
+        
+    def senoPartido(self, x, freq, a, Amp):
+        if x < -0 or x > a:
+            return 0
+        else:
+            return Amp * np.sin(2*np.pi*freq*x)
+        
+    def senoPartidoPeriodico(self, x, freq, a, Amp):
+        return self.periodicf(0, a, self.senoPartido, x, freq, a, Amp)
