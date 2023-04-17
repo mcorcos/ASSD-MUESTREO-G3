@@ -228,6 +228,11 @@ class System:
         self.N = N
         self.T = T
 
+        N = N * 10  # tomo 10 periodos de la señal original
+
+        # se utiliza una ventana rectangular, al saber el periodo de la señal y tomar un múltiplo
+        # de la misma
+
         y, t = (self.Xin[0][-N:], self.Xin[1][-N:])
         yf = fft.fft(y)
         self.XinSpectrum[1] = fft.fftfreq(N, T)[:N//2]
@@ -255,6 +260,8 @@ class System:
 
     """
     Signal getters
+
+        Devuelve 5 periodos de la señal
     """
     def getXinSignal(self):
         return (self.Xin[0][-5 * self.N:], self.Xin[1][-5 *self.N:])

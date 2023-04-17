@@ -44,28 +44,12 @@ class ScopePlot(MplCanvas):
 
         # Gráficos en frecuencia
         self.axes2.clear()
-        # Compute the one-dimensional discrete Fourier Transform.
-
-        # fft_wave = np.fft.fft(y_in)
-
-        # Compute the Discrete Fourier Transform sample frequencies.
-
-        # fft_fre = np.fft.fftfreq(n=y_in.size, d=1/100)
 
         self.axes2.plot(freq_in, amp_in)
         self.axes2.grid(which='major', axis='both')
         self.axes2.set_title("FFT in Frequency Domain")
+        self.axes2.set_xlim(0, 150e3)
 
-        # # graficos en frecuencia
-        # self.axes2.clear()
-
-        # Y = fft(y_in)
-        # n = len(y_in)
-        # # convierto a HZ
-        # f = np.linspace(0, 1, n) * (1/t_in[1])
-        # self.axes2.plot(f, np.abs(Y) , color='m')
-        # self.axes2.set_xlabel('Frequency (Hz)')
-        # self.axes2.set_ylabel('Magnitude')
 
         self.fig.canvas.draw()
 

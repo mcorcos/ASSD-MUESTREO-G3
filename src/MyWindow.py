@@ -57,6 +57,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.check_analogswitch.stateChanged.connect(self.changeCheckBoxColor2)
         self.check_fr.stateChanged.connect(self.changeCheckBoxColor3)
         self.check_sh.stateChanged.connect(self.changeCheckBoxColor4)
+        self.XinSelect.currentIndexChanged.connect(self.changeSignalStackedWidget)
 
 
         # Botón de graficar 
@@ -257,15 +258,32 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def update(self):
         y, t = self.getUserFunction()
 
-        fp = 20e3
-        ap = 1
-        fa = 2*fp
-        aa = 40
+        fp = self.strToFloat(self.fpValue.text())
+        ap = self.strToFloat(self.apValue.text())
+        fa = self.strToFloat(self.faValue.text())
+        aa = self.strToFloat(self.aaValue.text())
 
         fs = self.strToFloat(self.text_fs.text()) * mul[self.mulBox1.currentText()]
         dut = self.strToFloat(self.text_duty.text()) / 100
 
-        self.system.updateStages(fp, ap, fa, aa, "ellip", fs, dut)
+        approx = "ellip"
+
+        if self.filterTypeBox.currentText() == "Butter":
+            approx = "butter"
+
+        elif self.filterTypeBox.currentText() == "Cheby1":
+            approx = "cheby1"
+
+        elif self.filterTypeBox.currentText() == "Cheby2":
+            approx = "cheby2"
+
+        elif self.filterTypeBox.currentText() == "Cauer":
+            approx = "ellip"
+
+        else:
+            print("Mismatch between filter types")
+
+        self.system.updateStages(fp, ap, fa, aa, approx, fs, dut)
 
         self.system.updateSignals(y, t, self.N, self.T, self.getCheckList())
 
@@ -300,13 +318,19 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
     def getUserFunction(self):
 
-        Nperiods = 10
+        Nperiods = 20
 
         fb = self.strToFloat(self.signalFrequency.text()) * mul[self.mulBoxSignal_3.currentText()]
         A = self.strToFloat(self.signalAmplitude.text())
         pha = self.strToFloat(self.signalPhase.text())
         dut = self.strToFloat(self.signalDuty.text()) / 100
         off = self.strToFloat(self.signalOffset.text())
+
+        # para AM
+        fm = self.strToFloat(self.envelopeFreq.text()) * mul[self.mulBoxSignal_4.currentText()]
+        fp = self.strToFloat(self.carrierFreq.text()) * mul[self.mulBoxSignal_5.currentText()]
+        Amp = self.strToFloat(self.amAmplitude.text())
+        m = self.strToFloat(self.modulationIndex.text())
 
         # Definimos un periodo de muestreo y cuánto tiempo se muestrea (ventana)
         self.N = 1000   # número de muestras por periodo
@@ -328,7 +352,24 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         elif self.XinSelect.currentText() == "Saw Tooth":
             y = A * ss.sawtooth(2 * np.pi * fb * t + pha, width = 1) + off
 
+        elif self.XinSelect.currentText() == "AM":
+            
+            # Definimos un periodo de muestreo y cuánto tiempo se muestrea (ventana)
+            T1 = 1/fm                   # periodo de la muestra de la moduladora
+            self.T = T1 / self.N        # espaciado entre muestras
+
+            # tomo Nperiods de la muestra
+            t = np.linspace(0, self.T * self.N * Nperiods, self.N * Nperiods, endpoint=False)
+
+            y = (1 + m * np.cos(2 * np.pi * fm * t)) * Amp * np.cos(2 * np.pi * fp * t)
+
         else:
             print("Mismatch between signals")
 
         return y, t
+    
+    def changeSignalStackedWidget(self, index):
+        if index == 4:
+            self.stackedWidget.setCurrentIndex(1)
+        else:
+            self.stackedWidget.setCurrentIndex(0)
